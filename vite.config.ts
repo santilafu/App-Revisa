@@ -17,8 +17,8 @@ export default defineConfig({
     VitePWA({
       // "autoUpdate": cuando publiques una versión nueva, se actualiza sola.
       registerType: 'autoUpdate',
-      // Archivos sueltos que queremos que la PWA cachee.
-      includeAssets: ['favicon.svg'],
+      // Archivos sueltos (iconos) que queremos que la PWA incluya.
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icono.svg'],
 
       // El "manifest": la ficha de identidad de tu app cuando se instala en el móvil.
       manifest: {
@@ -30,12 +30,13 @@ export default defineConfig({
         background_color: '#0b0f17',  // Color de la pantalla de carga.
         display: 'standalone',        // Se abre como app, sin barra del navegador.
         start_url: '/',
-        // De momento usamos el favicon.svg que ya existe como icono provisional.
-        // En una fase posterior pondremos iconos PNG propios (192px y 512px).
+        // Iconos PNG generados a partir de public/icono.svg (pnpm generate-pwa-assets).
+        // El "maskable" es la versión que Android recorta en distintas formas.
         icons: [
-          { src: '/favicon.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/favicon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/favicon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: '/pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
 

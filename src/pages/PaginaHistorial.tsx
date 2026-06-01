@@ -10,6 +10,7 @@ import { CheckCircle2, Gauge } from 'lucide-react'
 import { db } from '../db/database'
 import { formatearFechaCorta } from '../utils/fechas'
 import { Cabecera } from '../components/Cabecera'
+import { Pagina } from '../components/Pagina'
 
 const variantesLista = { oculto: {}, visible: { transition: { staggerChildren: 0.06 } } }
 const variantesItem = { oculto: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }
@@ -26,11 +27,7 @@ export default function PaginaHistorial() {
   }, [idNum])
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex min-h-full flex-col pb-8"
-    >
+    <Pagina className="pb-8">
       <Cabecera titulo="Historial" mostrarVolver />
 
       {/* Estado vacío. */}
@@ -78,6 +75,6 @@ export default function PaginaHistorial() {
           ))}
         </motion.ul>
       )}
-    </motion.div>
+    </Pagina>
   )
 }

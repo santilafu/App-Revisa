@@ -6,7 +6,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, History, Wrench } from 'lucide-react'
+import { Plus, History, Wrench, Pencil } from 'lucide-react'
 import { db } from '../db/database'
 import type { Mantenimiento } from '../types'
 import { buscarMarcaPorNombre } from '../data/marcas'
@@ -16,6 +16,7 @@ import { Cabecera } from '../components/Cabecera'
 import { LogoMarca } from '../components/LogoMarca'
 import { TarjetaMantenimiento } from '../components/TarjetaMantenimiento'
 import { ModalCompletar, type DatosCompletar } from '../components/ModalCompletar'
+import { Pagina } from '../components/Pagina'
 
 const variantesLista = { oculto: {}, visible: { transition: { staggerChildren: 0.06 } } }
 const variantesTarjeta = { oculto: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }
@@ -78,12 +79,9 @@ export default function PaginaDetalleVehiculo() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex min-h-full flex-col pb-28"
-    >
-      <Cabecera titulo="Vehículo" mostrarVolver />
+    <>
+      <Pagina className="pb-28">
+        <Cabecera titulo="Vehículo" mostrarVolver />
 
       {/* Resumen del vehículo. */}
       <div className="mx-5 mb-6 flex items-center gap-4 rounded-2xl bg-superficie p-5">
@@ -101,6 +99,14 @@ export default function PaginaDetalleVehiculo() {
             </p>
           )}
         </div>
+        {/* Botón para editar los datos y los km del vehículo. */}
+        <Link
+          to={`/vehiculo/${idNum}/editar`}
+          aria-label="Editar vehículo"
+          className="flex h-10 w-10 shrink-0 items-center justify-center self-start rounded-full bg-white/10 text-white transition-colors hover:bg-white/15"
+        >
+          <Pencil size={18} />
+        </Link>
       </div>
 
       {/* Cabecera de la sección + enlace al historial. */}
@@ -142,7 +148,9 @@ export default function PaginaDetalleVehiculo() {
         </motion.ul>
       )}
 
-      {/* Botón flotante para añadir un mantenimiento. */}
+      </Pagina>
+
+      {/* Botón flotante para añadir un mantenimiento — FUERA de <Pagina>. */}
       <Link
         to={`/vehiculo/${idNum}/mantenimiento/nuevo`}
         aria-label="Añadir mantenimiento"
@@ -152,7 +160,8 @@ export default function PaginaDetalleVehiculo() {
       </Link>
 
       {/* El modal solo existe cuando "completando" tiene un mantenimiento.
-          AnimatePresence permite que se anime también al SALIR (al cerrarse). */}
+          AnimatePresence permite que se anime también al SALIR (al cerrarse).
+          Va FUERA de <Pagina> para que el overlay cubra toda la pantalla. */}
       <AnimatePresence>
         {completando && (
           <ModalCompletar
@@ -163,6 +172,6 @@ export default function PaginaDetalleVehiculo() {
           />
         )}
       </AnimatePresence>
-    </motion.div>
+    </>
   )
 }

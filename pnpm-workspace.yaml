@@ -1,0 +1,6 @@
+# Configuración de pnpm. En pnpm 11, ciertos ajustes viven aquí (ya no en package.json).
+# "allowBuilds" autoriza a ejecutar los scripts de instalación de un paquete.
+# "sharp" los necesita: compila/descarga binarios para convertir imágenes
+# (lo usa el generador de iconos de la PWA).
+allowBuilds:
+  sharp: true

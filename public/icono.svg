@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Icono base de la app "Revisa" (un cuentakilómetros estilizado).
+  A partir de este SVG generamos los PNG que usa la PWA al instalarse.
+  Solo usa formas (círculos y líneas) para que se convierta a PNG sin problemas.
+-->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A2742"/>
+      <stop offset="1" stop-color="#0C1322"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo: cuadrado redondeado con degradado. Rellena todo (seguro para maskable). -->
+  <rect width="512" height="512" rx="112" fill="url(#fondo)"/>
+
+  <!-- Aro del cuentakilómetros (pista gris). Gira 135° para dejar el hueco abajo. -->
+  <circle cx="256" cy="262" r="132" fill="none" stroke="#2A3A5E" stroke-width="30"
+          stroke-linecap="round" stroke-dasharray="622 208"
+          transform="rotate(135 256 262)"/>
+
+  <!-- Tramo verde (la "marca" que se llena). -->
+  <circle cx="256" cy="262" r="132" fill="none" stroke="#22c55e" stroke-width="30"
+          stroke-linecap="round" stroke-dasharray="250 829"
+          transform="rotate(135 256 262)"/>
+
+  <!-- Aguja del cuentakilómetros. -->
+  <line x1="256" y1="262" x2="334" y2="206" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+  <!-- Eje central. -->
+  <circle cx="256" cy="262" r="22" fill="#ffffff"/>
+</svg>

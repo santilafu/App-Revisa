@@ -10,6 +10,7 @@ import { db } from '../db/database'
 import { Cabecera } from '../components/Cabecera'
 import { TarjetaVehiculo } from '../components/TarjetaVehiculo'
 import { Boton } from '../components/Boton'
+import { Pagina } from '../components/Pagina'
 
 // ── Animación en cascada (stagger) ──────────────────────────────────────────
 // En Framer Motion, las "variants" son estados con nombre. El contenedor coordina
@@ -32,12 +33,9 @@ export default function PaginaInicio() {
 
   return (
     // motion.div con fade de entrada: la pantalla aparece suavemente.
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex min-h-full flex-col pb-28" // pb-28: hueco para el botón flotante.
-    >
-      <Cabecera titulo="Mis vehículos" />
+    <>
+      <Pagina className="pb-28">
+        <Cabecera titulo="Mis vehículos" />
 
       {/* CASO 1: todavía cargando (undefined). No mostramos nada para evitar parpadeos. */}
       {vehiculos === undefined && null}
@@ -81,7 +79,10 @@ export default function PaginaInicio() {
         </motion.ul>
       )}
 
-      {/* Botón flotante "+" (abajo a la derecha) para añadir, siempre visible. */}
+      </Pagina>
+
+      {/* Botón flotante "+" — va FUERA de <Pagina>: como la transición usa
+          transform, un elemento fixed dentro perdería su anclaje a la pantalla. */}
       <Link
         to="/anadir"
         aria-label="Añadir vehículo"
@@ -89,6 +90,6 @@ export default function PaginaInicio() {
       >
         <Plus size={26} />
       </Link>
-    </motion.div>
+    </>
   )
 }

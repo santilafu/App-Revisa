@@ -6,7 +6,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Check, Trash2 } from 'lucide-react'
 import { db } from '../db/database'
@@ -15,6 +14,7 @@ import { TIPOS_MANTENIMIENTO } from '../data/tiposMantenimiento'
 import { evaluarMantenimiento } from '../utils/mantenimiento'
 import { Cabecera } from '../components/Cabecera'
 import { Boton } from '../components/Boton'
+import { Pagina } from '../components/Pagina'
 
 const claseInput =
   'w-full rounded-xl bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/30'
@@ -90,11 +90,7 @@ export default function PaginaMantenimiento() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex min-h-full flex-col pb-8"
-    >
+    <Pagina className="pb-8">
       <Cabecera titulo={editando ? 'Editar mantenimiento' : 'Nuevo mantenimiento'} mostrarVolver />
 
       <form
@@ -197,6 +193,6 @@ export default function PaginaMantenimiento() {
           </button>
         )}
       </form>
-    </motion.div>
+    </Pagina>
   )
 }
