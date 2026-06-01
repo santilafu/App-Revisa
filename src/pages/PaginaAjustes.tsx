@@ -3,9 +3,10 @@
 // Ajustes de la app: copia de seguridad (exportar / importar) y activar avisos.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useRef, useState } from 'react'
-import { Download, Upload, Bell, BellRing, BellOff } from 'lucide-react'
+import { Download, Upload, Bell, BellRing, BellOff, Sun, Moon } from 'lucide-react'
 import { exportarDatos, importarDatos } from '../utils/backup'
 import { permisoActual, pedirPermiso, type EstadoPermiso } from '../utils/notificaciones'
+import { obtenerTema, aplicarTema, type Tema } from '../utils/tema'
 import { Pagina } from '../components/Pagina'
 import { Cabecera } from '../components/Cabecera'
 import { Boton } from '../components/Boton'
@@ -16,6 +17,12 @@ export default function PaginaAjustes() {
   // Archivo que el usuario quiere importar, a la espera de confirmación.
   const [archivoImportar, setArchivoImportar] = useState<File | null>(null)
   const [permiso, setPermiso] = useState<EstadoPermiso>(permisoActual())
+  const [tema, setTema] = useState<Tema>(obtenerTema())
+
+  function cambiarTema(nuevo: Tema) {
+    aplicarTema(nuevo)
+    setTema(nuevo)
+  }
 
   // Referencia al <input file> oculto, para abrirlo desde un botón normal.
   const inputArchivo = useRef<HTMLInputElement>(null)
@@ -47,6 +54,32 @@ export default function PaginaAjustes() {
       <Cabecera titulo="Ajustes" mostrarVolver />
 
       <div className="flex flex-col gap-6 px-5">
+        {/* ── APARIENCIA (tema claro / oscuro) ───────────────────────────────── */}
+        <section className="rounded-2xl bg-superficie p-5">
+          <h2 className="font-semibold text-white">Apariencia</h2>
+          <p className="mt-1 text-sm text-gray-400">Elige el tema de la app.</p>
+          <div className="mt-4 flex gap-3">
+            <button
+              type="button"
+              onClick={() => cambiarTema('oscuro')}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-colors ${
+                tema === 'oscuro' ? 'bg-white text-gray-900' : 'bg-white/5 text-gray-300 hover:bg-white/10'
+              }`}
+            >
+              <Moon size={18} /> Oscuro
+            </button>
+            <button
+              type="button"
+              onClick={() => cambiarTema('claro')}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-colors ${
+                tema === 'claro' ? 'bg-white text-gray-900' : 'bg-white/5 text-gray-300 hover:bg-white/10'
+              }`}
+            >
+              <Sun size={18} /> Claro
+            </button>
+          </div>
+        </section>
+
         {/* ── COPIA DE SEGURIDAD ─────────────────────────────────────────────── */}
         <section className="rounded-2xl bg-superficie p-5">
           <h2 className="font-semibold text-white">Copia de seguridad</h2>

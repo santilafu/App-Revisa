@@ -36,7 +36,7 @@ export function TarjetaVehiculo({ vehiculo, estado = null }: PropsTarjetaVehicul
           className="h-[52px] w-[52px] shrink-0 rounded-full object-cover"
         />
       ) : (
-        <LogoMarca nombre={vehiculo.marca} color={color} tamano={52} />
+        <LogoMarca nombre={vehiculo.marca} color={color} logo={marca?.logo} tamano={52} />
       )}
 
       {/* Bloque de texto: marca + modelo arriba, año y km debajo. */}

@@ -93,7 +93,7 @@ export default function PaginaDetalleVehiculo() {
             className="h-16 w-16 shrink-0 rounded-2xl object-cover"
           />
         ) : (
-          <LogoMarca nombre={vehiculo.marca} color={color} tamano={64} />
+          <LogoMarca nombre={vehiculo.marca} color={color} logo={marca?.logo} tamano={64} />
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-lg font-bold text-white">

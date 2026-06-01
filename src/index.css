@@ -23,6 +23,7 @@
 
   --color-fondo: #0b0f17;          /* fondo general de la app (oscuro) */
   --color-superficie: #151b26;     /* color de las tarjetas, un poco más claro */
+  --color-texto: #e5e7eb;          /* color del texto principal */
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -42,7 +43,26 @@ body,
 body {
   margin: 0;
   background-color: var(--color-fondo);
-  color: #e5e7eb; /* Texto gris muy claro, cómodo de leer sobre fondo oscuro. */
+  color: var(--color-texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased; /* Tipografía más nítida. */
+}
+
+/* ─── Modo claro ─────────────────────────────────────────────────────────────
+   Al poner la clase "tema-claro" en <html>, redefinimos las variables de color.
+   Como los componentes usan estas variables por debajo (Tailwind v4), TODO el
+   color cambia a la vez SIN tener que editar cada archivo. */
+html.tema-claro {
+  color-scheme: light;
+  --color-fondo: #f3f4f6;
+  --color-superficie: #ffffff;
+  --color-texto: #0b0f17;
+
+  /* Remapeamos la paleta de Tailwind que usan los componentes: */
+  --color-white: #0b0f17;    /* el "blanco" (textos y botones) pasa a oscuro */
+  --color-gray-900: #ffffff; /* el texto sobre botones (ahora oscuros) va en blanco */
+  --color-gray-100: #1f2937; /* hover del botón primario (se mantiene oscuro) */
+  --color-gray-300: #4b5563;
+  --color-gray-400: #4b5563;
+  --color-gray-500: #6b7280;
 }

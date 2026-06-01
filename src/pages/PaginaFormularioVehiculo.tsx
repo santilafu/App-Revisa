@@ -164,7 +164,7 @@ export default function PaginaFormularioVehiculo() {
                     seleccionada ? 'bg-white/15 ring-2 ring-white/60' : 'hover:bg-white/5'
                   }`}
                 >
-                  <LogoMarca nombre={marca.nombre} color={marca.colorPlaceholder} tamano={40} />
+                  <LogoMarca nombre={marca.nombre} color={marca.colorPlaceholder} logo={marca.logo} tamano={40} />
                   <span className="w-full truncate text-center text-[11px] text-gray-400">
                     {marca.nombre}
                   </span>

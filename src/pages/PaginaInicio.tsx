@@ -3,14 +3,14 @@
 // Pantalla principal: lista de vehículos + resumen de avisos (próximos/vencidos)
 // y un punto de color por coche según su mantenimiento más urgente.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Car, Plus, Settings } from 'lucide-react'
+import { Car, Plus, Settings, Search } from 'lucide-react'
 import { db } from '../db/database'
 import type { EstadoMantenimiento } from '../types'
-import { resumenEstados } from '../utils/mantenimiento'
+import { resumenEstados, pesoUrgencia } from '../utils/mantenimiento'
 import { permisoActual, mostrarAviso } from '../utils/notificaciones'
 import { Cabecera } from '../components/Cabecera'
 import { TarjetaVehiculo } from '../components/TarjetaVehiculo'
@@ -56,6 +56,26 @@ export default function PaginaInicio() {
 
   const vehiculos = datos?.vehiculos
   const hayAvisos = totalVencidos > 0 || totalProximos > 0
+
+  // ── Buscador y orden ────────────────────────────────────────────────────────
+  const [busqueda, setBusqueda] = useState('')
+  const [orden, setOrden] = useState<'recientes' | 'nombre' | 'urgencia'>('recientes')
+
+  // "Peso" de urgencia de un vehículo (vencido=0 … sin nada=3) para ordenar.
+  const pesoDe = (id?: number) => {
+    const estado = id != null ? estadoPorVehiculo.get(id) : null
+    return estado ? pesoUrgencia(estado) : 3
+  }
+
+  // Lista final: filtrada por el texto del buscador y ordenada según la elección.
+  const termino = busqueda.trim().toLowerCase()
+  const listaMostrada = (vehiculos ?? [])
+    .filter((v) => `${v.marca} ${v.modelo} ${v.matricula ?? ''}`.toLowerCase().includes(termino))
+    .sort((a, b) => {
+      if (orden === 'nombre') return `${a.marca} ${a.modelo}`.localeCompare(`${b.marca} ${b.modelo}`)
+      if (orden === 'urgencia') return pesoDe(a.id) - pesoDe(b.id)
+      return b.fechaCreacion.localeCompare(a.fechaCreacion) // recientes
+    })
 
   return (
     <>
@@ -113,25 +133,74 @@ export default function PaginaInicio() {
           </div>
         )}
 
-        {/* CASO 3: hay vehículos → lista con cascada. */}
+        {/* CASO 3: hay vehículos → buscador, orden y lista. */}
         {vehiculos && vehiculos.length > 0 && (
-          <motion.ul
-            variants={variantesLista}
-            initial="oculto"
-            animate="visible"
-            className="flex flex-col gap-3 px-5"
-          >
-            {vehiculos.map((vehiculo) => (
-              <motion.li key={vehiculo.id} variants={variantesTarjeta}>
-                <Link to={`/vehiculo/${vehiculo.id}`} className="block active:scale-[0.98]">
-                  <TarjetaVehiculo
-                    vehiculo={vehiculo}
-                    estado={estadoPorVehiculo.get(vehiculo.id!) ?? null}
-                  />
-                </Link>
-              </motion.li>
-            ))}
-          </motion.ul>
+          <>
+            <div className="mb-4 flex flex-col gap-3 px-5">
+              {/* Buscador. El icono es decorativo (pointer-events-none). */}
+              <div className="relative">
+                <Search
+                  size={18}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Buscar por marca, modelo o matrícula"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  className="w-full rounded-xl bg-white/5 py-2.5 pl-10 pr-4 text-white placeholder-gray-500 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/30"
+                />
+              </div>
+              {/* Botones de orden. */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-gray-500">Ordenar:</span>
+                {(
+                  [
+                    ['recientes', 'Recientes'],
+                    ['nombre', 'Nombre'],
+                    ['urgencia', 'Urgencia'],
+                  ] as const
+                ).map(([valor, etiqueta]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    onClick={() => setOrden(valor)}
+                    className={`rounded-full px-3 py-1.5 transition-colors ${
+                      orden === valor
+                        ? 'bg-white text-gray-900'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    }`}
+                  >
+                    {etiqueta}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {listaMostrada.length === 0 ? (
+              <p className="px-5 text-center text-sm text-gray-500">
+                Ningún vehículo coincide con la búsqueda.
+              </p>
+            ) : (
+              <motion.ul
+                variants={variantesLista}
+                initial="oculto"
+                animate="visible"
+                className="flex flex-col gap-3 px-5"
+              >
+                {listaMostrada.map((vehiculo) => (
+                  <motion.li key={vehiculo.id} variants={variantesTarjeta}>
+                    <Link to={`/vehiculo/${vehiculo.id}`} className="block active:scale-[0.98]">
+                      <TarjetaVehiculo
+                        vehiculo={vehiculo}
+                        estado={estadoPorVehiculo.get(vehiculo.id!) ?? null}
+                      />
+                    </Link>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            )}
+          </>
         )}
       </Pagina>
 

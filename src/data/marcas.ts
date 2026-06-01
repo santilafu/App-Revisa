@@ -17,7 +17,11 @@ export interface Marca {
   nombre: string             // Nombre visible, ej. "Seat".
   colorPlaceholder: string   // Color de fondo del círculo provisional (hex).
   modelos: string[]          // Algunos modelos populares de esa marca.
-  // logo?: string           // ← (Futuro) ruta de la imagen real del logo.
+  // Ruta a la imagen del logo real, ej. '/logos/seat.svg'. Es OPCIONAL: si está,
+  // LogoMarca muestra la imagen; si no, dibuja el círculo con iniciales.
+  // Cómo añadir un logo: 1) pon el archivo en public/logos/  2) escribe aquí su ruta.
+  // (Recuerda: los logos son marcas registradas; añádelos solo con su licencia.)
+  logo?: string
 }
 
 /**

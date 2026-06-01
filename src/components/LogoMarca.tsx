@@ -1,61 +1,69 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // components/LogoMarca.tsx
-// Logo PROVISIONAL de una marca: un círculo de color con sus iniciales.
-// (Recuerda: los logos reales son marcas registradas; los pondremos más tarde.)
-// Este componente es "reutilizable": lo usaremos en la tarjeta del coche y en el
-// selector de marcas del formulario.
+// Logo de una marca. Si recibe la ruta de una imagen ("logo"), la muestra dentro
+// de un círculo blanco. Si no, dibuja un círculo de color con las INICIALES
+// (placeholder provisional, porque los logos reales son marcas registradas).
 // ─────────────────────────────────────────────────────────────────────────────
+import { useState } from 'react'
 
-// Las "props" son los datos que recibe un componente desde fuera, como los
-// argumentos de una función. Aquí definimos su forma con TypeScript.
 interface PropsLogoMarca {
-  nombre: string  // Nombre de la marca, ej. "Seat".
-  color: string   // Color de fondo del círculo (hex), ej. "#E30613".
-  tamano?: number // Diámetro en píxeles. Opcional: si no se pasa, vale 48.
+  nombre: string   // Nombre de la marca, ej. "Seat".
+  color: string    // Color de fondo del círculo provisional (hex).
+  tamano?: number  // Diámetro en píxeles. Opcional: por defecto 48.
+  logo?: string    // Ruta de la imagen del logo (opcional).
 }
 
-/**
- * Calcula las iniciales de una marca para mostrarlas en el círculo.
- * - Si tiene varias palabras ("Land Rover" / "Mercedes-Benz") → 1ª letra de las 2 primeras: "LR", "MB".
- * - Si es una sola palabra ("Seat") → sus 2 primeras letras: "SE".
- */
+/** Iniciales para el placeholder (ver explicación en cada caso). */
 function obtenerIniciales(nombre: string): string {
-  // Partimos el nombre por espacios o guiones.
   const palabras = nombre.split(/[\s-]+/).filter(Boolean)
-  if (palabras.length >= 2) {
-    return (palabras[0][0] + palabras[1][0]).toUpperCase()
-  }
+  if (palabras.length >= 2) return (palabras[0][0] + palabras[1][0]).toUpperCase()
   return nombre.slice(0, 2).toUpperCase()
 }
 
-/**
- * Decide si sobre un color de fondo se lee mejor texto NEGRO o BLANCO.
- * Calcula la "luminancia" (cuánto brilla el color): si es muy claro (amarillos,
- * etc.), usamos texto negro; si es oscuro, texto blanco. Así siempre se lee.
- */
+/** Elige texto negro o blanco según lo claro/oscuro que sea el color de fondo. */
 function colorDeTextoLegible(hexFondo: string): string {
   const hex = hexFondo.replace('#', '')
   const r = parseInt(hex.substring(0, 2), 16)
   const g = parseInt(hex.substring(2, 4), 16)
   const b = parseInt(hex.substring(4, 6), 16)
-  // Fórmula estándar de luminancia percibida (el ojo ve más el verde).
   const luminancia = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-  return luminancia > 0.6 ? '#111827' : '#ffffff' // claro → negro, oscuro → blanco
+  return luminancia > 0.6 ? '#111827' : '#ffffff'
 }
 
-export function LogoMarca({ nombre, color, tamano = 48 }: PropsLogoMarca) {
+export function LogoMarca({ nombre, color, tamano = 48, logo }: PropsLogoMarca) {
+  // Si la imagen falla al cargar (ruta mal o archivo inexistente), volvemos
+  // al placeholder de iniciales sin romper nada.
+  const [errorImagen, setErrorImagen] = useState(false)
+
+  // CASO 1: hay logo y carga bien → mostramos la imagen sobre fondo blanco.
+  if (logo && !errorImagen) {
+    return (
+      <div
+        // El fondo blanco se fija con estilo en línea (no con la clase bg-white)
+        // para que el modo claro/oscuro NO lo altere: un logo necesita su fondo.
+        style={{ width: tamano, height: tamano, backgroundColor: '#ffffff' }}
+        className="flex shrink-0 items-center justify-center overflow-hidden rounded-full p-1.5"
+      >
+        <img
+          src={logo}
+          alt={nombre}
+          onError={() => setErrorImagen(true)}
+          className="h-full w-full object-contain"
+        />
+      </div>
+    )
+  }
+
+  // CASO 2: sin logo (o falló) → círculo de color con iniciales.
   return (
     <div
-      // Usamos "style" (estilo en línea) para lo que es dinámico: el color y el
-      // tamaño dependen de datos, así que no pueden ser clases fijas de Tailwind.
       style={{
         width: tamano,
         height: tamano,
         backgroundColor: color,
         color: colorDeTextoLegible(color),
-        fontSize: tamano * 0.36, // El texto escala con el tamaño del círculo.
+        fontSize: tamano * 0.36,
       }}
-      // Las clases de Tailwind sí son fijas: redondo, centrado y en negrita.
       className="flex shrink-0 select-none items-center justify-center rounded-full font-bold"
     >
       {obtenerIniciales(nombre)}

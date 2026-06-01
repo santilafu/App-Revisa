@@ -8,6 +8,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css' // Cargamos los estilos globales (Tailwind + nuestros colores).
 import App from './App.tsx'
+import { aplicarTema, obtenerTema } from './utils/tema'
+
+// Aplicamos el tema guardado ANTES de dibujar, para que no haya un "parpadeo"
+// de color al cargar la página.
+aplicarTema(obtenerTema())
 
 // 1) Buscamos el div con id="root" en el HTML.
 // 2) createRoot prepara React para dibujar dentro de ese div.
