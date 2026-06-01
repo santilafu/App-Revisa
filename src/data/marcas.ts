@@ -61,3 +61,14 @@ export const MARCAS: Marca[] = [
   { id: 'volkswagen', nombre: 'Volkswagen', colorPlaceholder: '#001E50', modelos: ['Golf', 'Polo', 'Passat', 'Tiguan', 'T-Roc', 'Touran'] },
   { id: 'volvo', nombre: 'Volvo', colorPlaceholder: '#003057', modelos: ['XC40', 'XC60', 'XC90', 'V40', 'S60'] },
 ]
+
+/**
+ * Busca una marca por su NOMBRE (ej. "Seat") dentro del catálogo.
+ * Lo usaremos, por ejemplo, en la tarjeta de un vehículo: como guardamos el
+ * nombre de la marca, con esta función recuperamos su color para pintar el logo.
+ * Devuelve la marca encontrada, o "undefined" si no está en la lista.
+ */
+export function buscarMarcaPorNombre(nombre: string): Marca | undefined {
+  return MARCAS.find((marca) => marca.nombre === nombre)
+}
+
