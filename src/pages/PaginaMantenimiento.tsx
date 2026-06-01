@@ -4,7 +4,7 @@
 // los dos casos: si la URL trae un ":mid" (id del mantenimiento), estamos editando;
 // si no, estamos creando uno nuevo. Reutilizar el formulario evita duplicar código.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Check, Trash2 } from 'lucide-react'
@@ -39,16 +39,19 @@ export default function PaginaMantenimiento() {
   const [kmLimite, setKmLimite] = useState('')
   const [notas, setNotas] = useState('')
 
-  // Cuando llega el mantenimiento existente (al editar), rellenamos los campos.
-  // useEffect ejecuta este código cada vez que "existente" cambia.
-  useEffect(() => {
-    if (existente) {
-      setTipo(existente.tipo)
-      setFechaLimite(existente.fechaLimite ?? '')
-      setKmLimite(existente.kmLimite != null ? String(existente.kmLimite) : '')
-      setNotas(existente.notas ?? '')
-    }
-  }, [existente])
+  // Guarda el id del mantenimiento que YA hemos volcado en el formulario.
+  const [idCargado, setIdCargado] = useState<number | undefined>(undefined)
+
+  // Cuando llega (o cambia) el mantenimiento a editar, copiamos sus datos a los
+  // campos. Se hace durante el render de forma controlada (patrón recomendado por
+  // React), en vez de dentro de un useEffect.
+  if (existente && existente.id !== idCargado) {
+    setIdCargado(existente.id)
+    setTipo(existente.tipo)
+    setFechaLimite(existente.fechaLimite ?? '')
+    setKmLimite(existente.kmLimite != null ? String(existente.kmLimite) : '')
+    setNotas(existente.notas ?? '')
+  }
 
   // Regla de validación: hace falta un tipo y AL MENOS un límite (fecha o km).
   const valido = tipo.trim() !== '' && (fechaLimite !== '' || kmLimite !== '')
@@ -102,8 +105,11 @@ export default function PaginaMantenimiento() {
       >
         {/* TIPO: campo de texto + sugerencias rápidas (chips). */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">Tipo</label>
+          <label htmlFor="tipo" className="mb-2 block text-sm font-medium text-gray-300">
+            Tipo
+          </label>
           <input
+            id="tipo"
             type="text"
             placeholder="Ej. Cambio de aceite"
             value={tipo}
@@ -133,10 +139,11 @@ export default function PaginaMantenimiento() {
 
         {/* FECHA LÍMITE (opcional). */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">
+          <label htmlFor="fecha-limite" className="mb-2 block text-sm font-medium text-gray-300">
             Fecha límite <span className="text-gray-500">(opcional)</span>
           </label>
           <input
+            id="fecha-limite"
             type="date"
             value={fechaLimite}
             onChange={(e) => setFechaLimite(e.target.value)}
@@ -146,10 +153,11 @@ export default function PaginaMantenimiento() {
 
         {/* KM LÍMITE (opcional). */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">
+          <label htmlFor="km-limite" className="mb-2 block text-sm font-medium text-gray-300">
             Kilómetros límite <span className="text-gray-500">(opcional)</span>
           </label>
           <input
+            id="km-limite"
             type="number"
             inputMode="numeric"
             placeholder="Ej. 90000"
@@ -162,10 +170,11 @@ export default function PaginaMantenimiento() {
 
         {/* NOTAS (opcional). */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">
+          <label htmlFor="notas" className="mb-2 block text-sm font-medium text-gray-300">
             Notas <span className="text-gray-500">(opcional)</span>
           </label>
           <textarea
+            id="notas"
             rows={3}
             placeholder="Ej. Llevar el coche al taller habitual"
             value={notas}

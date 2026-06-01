@@ -6,7 +6,7 @@
 // Usa Framer Motion para entrar/salir con animación. La salida (exit) la coordina
 // <AnimatePresence> desde la pantalla que lo abre.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { hoyComoYYYYMMDD } from '../utils/fechas'
 import { Boton } from './Boton'
@@ -34,6 +34,16 @@ export function ModalCompletar({ tipo, kmActuales, onCerrar, onConfirmar }: Prop
   const [km, setKm] = useState(String(kmActuales))
   const [notas, setNotas] = useState('')
 
+  // Cerrar el modal al pulsar la tecla Escape (accesibilidad y comodidad).
+  useEffect(() => {
+    function alPulsarTecla(e: KeyboardEvent) {
+      if (e.key === 'Escape') onCerrar()
+    }
+    window.addEventListener('keydown', alPulsarTecla)
+    // La función que devolvemos limpia el "oyente" cuando el modal se cierra.
+    return () => window.removeEventListener('keydown', alPulsarTecla)
+  }, [onCerrar])
+
   return (
     // Capa oscura que cubre toda la pantalla. Al hacer clic FUERA del panel, cierra.
     <motion.div
@@ -45,6 +55,11 @@ export function ModalCompletar({ tipo, kmActuales, onCerrar, onConfirmar }: Prop
     >
       {/* El panel sube desde abajo. stopPropagation evita que un clic dentro cierre. */}
       <motion.div
+        // role="dialog" + aria-modal indican a los lectores de pantalla que es
+        // una ventana modal; aria-labelledby la conecta con su título.
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-completar"
         className="w-full max-w-md rounded-3xl bg-superficie p-5"
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
@@ -52,13 +67,18 @@ export function ModalCompletar({ tipo, kmActuales, onCerrar, onConfirmar }: Prop
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold text-white">Completar mantenimiento</h2>
+        <h2 id="titulo-modal-completar" className="text-lg font-bold text-white">
+          Completar mantenimiento
+        </h2>
         <p className="mb-4 text-sm text-gray-400">{tipo}</p>
 
         <div className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-300">Fecha realizada</label>
+            <label htmlFor="m-fecha" className="mb-1.5 block text-sm font-medium text-gray-300">
+              Fecha realizada
+            </label>
             <input
+              id="m-fecha"
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
@@ -66,8 +86,11 @@ export function ModalCompletar({ tipo, kmActuales, onCerrar, onConfirmar }: Prop
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-300">Kilómetros</label>
+            <label htmlFor="m-km" className="mb-1.5 block text-sm font-medium text-gray-300">
+              Kilómetros
+            </label>
             <input
+              id="m-km"
               type="number"
               inputMode="numeric"
               value={km}
@@ -76,10 +99,11 @@ export function ModalCompletar({ tipo, kmActuales, onCerrar, onConfirmar }: Prop
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+            <label htmlFor="m-notas" className="mb-1.5 block text-sm font-medium text-gray-300">
               Notas <span className="text-gray-500">(opcional)</span>
             </label>
             <textarea
+              id="m-notas"
               rows={2}
               placeholder="Ej. Cambiado en el taller de Juan"
               value={notas}

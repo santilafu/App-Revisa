@@ -141,10 +141,12 @@ export default function PaginaInicio() {
               <div className="relative">
                 <Search
                   size={18}
+                  aria-hidden
                   className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
                 />
                 <input
                   type="text"
+                  aria-label="Buscar vehículos"
                   placeholder="Buscar por marca, modelo o matrícula"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}

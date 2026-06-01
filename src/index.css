@@ -66,3 +66,11 @@ html.tema-claro {
   --color-gray-400: #4b5563;
   --color-gray-500: #6b7280;
 }
+
+/* ─── Accesibilidad ──────────────────────────────────────────────────────────
+   Anillo de foco visible al navegar con el TECLADO (tecla Tab). :focus-visible
+   solo se activa con teclado, no al hacer clic con el ratón, así que no molesta. */
+*:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}

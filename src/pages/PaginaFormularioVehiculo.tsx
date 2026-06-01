@@ -5,7 +5,7 @@
 // Al editar, además, permite ELIMINAR el coche (y, en cascada, sus mantenimientos
 // e historial).
 // ─────────────────────────────────────────────────────────────────────────────
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Check, Trash2, ImagePlus, X } from 'lucide-react'
@@ -42,18 +42,22 @@ export default function PaginaFormularioVehiculo() {
   const [confirmarBorrado, setConfirmarBorrado] = useState(false)
   const [foto, setFoto] = useState<string | undefined>(undefined) // Foto como data URL.
 
-  // Al cargar el vehículo existente, volcamos sus datos en los campos.
-  useEffect(() => {
-    if (existente) {
-      // Recuperamos el id de la marca a partir de su nombre guardado.
-      setMarcaId(buscarMarcaPorNombre(existente.marca)?.id ?? null)
-      setModelo(existente.modelo)
-      setAnio(String(existente.anio))
-      setMatricula(existente.matricula ?? '')
-      setKm(String(existente.kmActuales))
-      setFoto(existente.foto)
-    }
-  }, [existente])
+  // Guarda el id del vehículo que YA hemos volcado en el formulario.
+  const [idCargado, setIdCargado] = useState<number | undefined>(undefined)
+
+  // Cuando llega (o cambia) el vehículo a editar, copiamos sus datos a los campos.
+  // Se hace DURANTE el render de forma controlada (patrón recomendado por React),
+  // en lugar de dentro de un useEffect.
+  if (existente && existente.id !== idCargado) {
+    setIdCargado(existente.id)
+    // Recuperamos el id de la marca a partir de su nombre guardado.
+    setMarcaId(buscarMarcaPorNombre(existente.marca)?.id ?? null)
+    setModelo(existente.modelo)
+    setAnio(String(existente.anio))
+    setMatricula(existente.matricula ?? '')
+    setKm(String(existente.kmActuales))
+    setFoto(existente.foto)
+  }
 
   // Cuando el usuario elige una imagen, la comprimimos y la guardamos en el estado.
   async function elegirFoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -203,8 +207,11 @@ export default function PaginaFormularioVehiculo() {
 
         {/* AÑO */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">Año</label>
+          <label htmlFor="anio" className="mb-2 block text-sm font-medium text-gray-300">
+            Año
+          </label>
           <input
+            id="anio"
             type="number"
             inputMode="numeric"
             placeholder="Ej. 2018"
@@ -218,10 +225,11 @@ export default function PaginaFormularioVehiculo() {
 
         {/* MATRÍCULA (opcional) */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">
+          <label htmlFor="matricula" className="mb-2 block text-sm font-medium text-gray-300">
             Matrícula <span className="text-gray-500">(opcional)</span>
           </label>
           <input
+            id="matricula"
             type="text"
             placeholder="Ej. 1234 ABC"
             value={matricula}
@@ -232,10 +240,11 @@ export default function PaginaFormularioVehiculo() {
 
         {/* KILÓMETROS ACTUALES */}
         <section>
-          <label className="mb-2 block text-sm font-medium text-gray-300">
+          <label htmlFor="km-actuales" className="mb-2 block text-sm font-medium text-gray-300">
             Kilómetros actuales
           </label>
           <input
+            id="km-actuales"
             type="number"
             inputMode="numeric"
             placeholder="Ej. 85000"
