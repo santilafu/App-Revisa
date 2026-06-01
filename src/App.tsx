@@ -10,6 +10,7 @@ import PaginaFormularioVehiculo from './pages/PaginaFormularioVehiculo'
 import PaginaDetalleVehiculo from './pages/PaginaDetalleVehiculo'
 import PaginaMantenimiento from './pages/PaginaMantenimiento'
 import PaginaHistorial from './pages/PaginaHistorial'
+import PaginaAjustes from './pages/PaginaAjustes'
 
 /**
  * Componente con las rutas. Está separado de App porque necesita useLocation(),
@@ -26,6 +27,7 @@ function Rutas() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PaginaInicio />} />
+        <Route path="/ajustes" element={<PaginaAjustes />} />
         <Route path="/anadir" element={<PaginaFormularioVehiculo />} />
         {/* ":id" y ":mid" son comodines: trozos variables de la URL. */}
         <Route path="/vehiculo/:id" element={<PaginaDetalleVehiculo />} />

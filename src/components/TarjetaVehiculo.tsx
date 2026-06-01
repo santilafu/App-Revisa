@@ -1,28 +1,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // components/TarjetaVehiculo.tsx
 // La tarjeta que representa a UN vehículo en la lista de Inicio.
-// Es un componente "de presentación": solo recibe los datos y los pinta bonito,
-// no contiene lógica de base de datos.
+// Muestra su foto (o el logo provisional), datos y un punto de color con el
+// estado de su mantenimiento más urgente.
 // ─────────────────────────────────────────────────────────────────────────────
-import { Gauge } from 'lucide-react' // Icono de cuentakilómetros.
-import type { Vehiculo } from '../types'
+import { Gauge } from 'lucide-react'
+import type { EstadoMantenimiento, Vehiculo } from '../types'
 import { buscarMarcaPorNombre } from '../data/marcas'
 import { LogoMarca } from './LogoMarca'
 
-interface PropsTarjetaVehiculo {
-  vehiculo: Vehiculo
+// Color del puntito indicador según el estado más urgente del vehículo.
+const COLOR_PUNTO: Record<EstadoMantenimiento, string> = {
+  'al-dia': 'bg-estado-aldia',
+  'proximo': 'bg-estado-proximo',
+  'vencido': 'bg-estado-vencido',
 }
 
-export function TarjetaVehiculo({ vehiculo }: PropsTarjetaVehiculo) {
-  // Buscamos la marca en el catálogo para obtener su color.
-  // Si no la encontramos (raro), usamos un gris neutro por defecto.
+interface PropsTarjetaVehiculo {
+  vehiculo: Vehiculo
+  // Estado más urgente de sus mantenimientos (o null si no tiene ninguno).
+  estado?: EstadoMantenimiento | null
+}
+
+export function TarjetaVehiculo({ vehiculo, estado = null }: PropsTarjetaVehiculo) {
   const marca = buscarMarcaPorNombre(vehiculo.marca)
   const color = marca?.colorPlaceholder ?? '#6b7280'
 
   return (
     <div className="flex items-center gap-4 rounded-2xl bg-superficie p-4">
-      {/* Logo provisional de la marca. */}
-      <LogoMarca nombre={vehiculo.marca} color={color} tamano={52} />
+      {/* Avatar: si el coche tiene foto, la mostramos; si no, el logo de la marca. */}
+      {vehiculo.foto ? (
+        <img
+          src={vehiculo.foto}
+          alt={`${vehiculo.marca} ${vehiculo.modelo}`}
+          className="h-[52px] w-[52px] shrink-0 rounded-full object-cover"
+        />
+      ) : (
+        <LogoMarca nombre={vehiculo.marca} color={color} tamano={52} />
+      )}
 
       {/* Bloque de texto: marca + modelo arriba, año y km debajo. */}
       <div className="min-w-0 flex-1">
@@ -44,6 +59,9 @@ export function TarjetaVehiculo({ vehiculo }: PropsTarjetaVehiculo) {
           </p>
         )}
       </div>
+
+      {/* Punto de color con el estado más urgente (si hay mantenimientos). */}
+      {estado && <span className={`h-3 w-3 shrink-0 rounded-full ${COLOR_PUNTO[estado]}`} />}
     </div>
   )
 }

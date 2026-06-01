@@ -5,13 +5,15 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react' // Icono de flecha, de la librería lucide-react.
+import type { ReactNode } from 'react'
 
 interface PropsCabecera {
   titulo: string
   mostrarVolver?: boolean // Si es true, dibuja la flecha de "atrás".
+  accion?: ReactNode      // Elemento opcional a la derecha (ej. un botón de ajustes).
 }
 
-export function Cabecera({ titulo, mostrarVolver = false }: PropsCabecera) {
+export function Cabecera({ titulo, mostrarVolver = false, accion }: PropsCabecera) {
   // useNavigate nos da una función para movernos entre pantallas por código.
   const navegar = useNavigate()
 
@@ -27,7 +29,9 @@ export function Cabecera({ titulo, mostrarVolver = false }: PropsCabecera) {
           <ArrowLeft size={22} />
         </button>
       )}
-      <h1 className="text-2xl font-bold text-white">{titulo}</h1>
+      {/* flex-1 empuja la "accion" hacia la derecha del todo. */}
+      <h1 className="flex-1 text-2xl font-bold text-white">{titulo}</h1>
+      {accion}
     </header>
   )
 }

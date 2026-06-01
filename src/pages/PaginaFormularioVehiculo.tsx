@@ -8,13 +8,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Check, Trash2 } from 'lucide-react'
+import { Check, Trash2, ImagePlus, X } from 'lucide-react'
 import { db } from '../db/database'
 import { MARCAS, buscarMarcaPorNombre } from '../data/marcas'
 import { Cabecera } from '../components/Cabecera'
 import { Boton } from '../components/Boton'
 import { LogoMarca } from '../components/LogoMarca'
 import { Pagina } from '../components/Pagina'
+import { comprimirImagen } from '../utils/imagen'
 
 const claseInput =
   'w-full rounded-xl bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/30'
@@ -39,6 +40,7 @@ export default function PaginaFormularioVehiculo() {
   const [km, setKm] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [confirmarBorrado, setConfirmarBorrado] = useState(false)
+  const [foto, setFoto] = useState<string | undefined>(undefined) // Foto como data URL.
 
   // Al cargar el vehículo existente, volcamos sus datos en los campos.
   useEffect(() => {
@@ -49,8 +51,15 @@ export default function PaginaFormularioVehiculo() {
       setAnio(String(existente.anio))
       setMatricula(existente.matricula ?? '')
       setKm(String(existente.kmActuales))
+      setFoto(existente.foto)
     }
   }, [existente])
+
+  // Cuando el usuario elige una imagen, la comprimimos y la guardamos en el estado.
+  async function elegirFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const archivo = e.target.files?.[0]
+    if (archivo) setFoto(await comprimirImagen(archivo))
+  }
 
   const marcaSeleccionada = MARCAS.find((m) => m.id === marcaId)
   const valido = marcaSeleccionada !== undefined && modelo !== '' && anio !== '' && km !== ''
@@ -66,6 +75,7 @@ export default function PaginaFormularioVehiculo() {
         anio: Number(anio),
         matricula: matricula.trim() || undefined,
         kmActuales: Number(km),
+        foto: foto || undefined,
       }
       if (editando) {
         // update cambia solo los campos indicados (no toca fechaCreacion).
@@ -101,6 +111,41 @@ export default function PaginaFormularioVehiculo() {
         }}
         className="flex flex-col gap-6 px-5"
       >
+        {/* FOTO (opcional): vista previa + elegir/quitar. */}
+        <section className="flex flex-col items-center gap-2">
+          <div className="relative">
+            {foto ? (
+              <img
+                src={foto}
+                alt="Foto del vehículo"
+                className="h-24 w-24 rounded-2xl object-cover"
+              />
+            ) : (
+              <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-white/15 text-gray-500 transition-colors hover:border-white/30">
+                <ImagePlus size={24} />
+                <span className="text-[11px]">Foto</span>
+                <input type="file" accept="image/*" className="hidden" onChange={elegirFoto} />
+              </label>
+            )}
+            {foto && (
+              <button
+                type="button"
+                onClick={() => setFoto(undefined)}
+                aria-label="Quitar foto"
+                className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-estado-vencido text-white"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          {foto && (
+            <label className="cursor-pointer text-xs text-gray-400 transition-colors hover:text-white">
+              Cambiar foto
+              <input type="file" accept="image/*" className="hidden" onChange={elegirFoto} />
+            </label>
+          )}
+        </section>
+
         {/* MARCA: rejilla de logos. */}
         <section>
           <label className="mb-2 block text-sm font-medium text-gray-300">Marca</label>

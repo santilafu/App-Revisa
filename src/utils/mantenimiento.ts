@@ -72,3 +72,32 @@ export function pesoUrgencia(estado: EstadoMantenimiento): number {
   if (estado === 'proximo') return 1
   return 2
 }
+
+// Resumen de los estados de TODOS los mantenimientos de un vehículo.
+// Lo usamos en la pantalla de Inicio para el banner y el punto de color.
+export interface ResumenEstados {
+  vencidos: number
+  proximos: number
+  alDia: number
+  total: number
+  masUrgente: EstadoMantenimiento | null // El peor estado presente (o null si no hay nada).
+}
+
+export function resumenEstados(mantenimientos: Mantenimiento[], kmActuales: number): ResumenEstados {
+  let vencidos = 0
+  let proximos = 0
+  let alDia = 0
+  for (const m of mantenimientos) {
+    const estado = evaluarMantenimiento(m, kmActuales).estado
+    if (estado === 'vencido') vencidos++
+    else if (estado === 'proximo') proximos++
+    else alDia++
+  }
+
+  let masUrgente: EstadoMantenimiento | null = null
+  if (vencidos > 0) masUrgente = 'vencido'
+  else if (proximos > 0) masUrgente = 'proximo'
+  else if (alDia > 0) masUrgente = 'al-dia'
+
+  return { vencidos, proximos, alDia, total: mantenimientos.length, masUrgente }
+}

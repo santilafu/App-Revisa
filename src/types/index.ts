@@ -27,6 +27,9 @@ export interface Vehiculo {
   anio: number           // Año del coche, ej. 2018.
   matricula?: string     // Opcional: el usuario puede dejarla en blanco.
   kmActuales: number     // Kilómetros actuales del cuentakilómetros.
+  // Foto del coche como "data URL" (texto base64). La guardamos como texto (y no
+  // como archivo binario) para que la copia de seguridad en JSON la incluya sin líos.
+  foto?: string
   // Guardamos las fechas como texto en formato ISO (ej. "2026-06-01T10:00:00.000Z").
   // Para un principiante es más sencillo de almacenar, leer y depurar que un objeto Date.
   fechaCreacion: string

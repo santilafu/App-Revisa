@@ -1,88 +1,141 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // pages/PaginaInicio.tsx
-// Pantalla principal: la lista de vehículos del usuario.
+// Pantalla principal: lista de vehículos + resumen de avisos (próximos/vencidos)
+// y un punto de color por coche según su mantenimiento más urgente.
 // ─────────────────────────────────────────────────────────────────────────────
+import { useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Car, Plus } from 'lucide-react'
+import { Car, Plus, Settings } from 'lucide-react'
 import { db } from '../db/database'
+import type { EstadoMantenimiento } from '../types'
+import { resumenEstados } from '../utils/mantenimiento'
+import { permisoActual, mostrarAviso } from '../utils/notificaciones'
 import { Cabecera } from '../components/Cabecera'
 import { TarjetaVehiculo } from '../components/TarjetaVehiculo'
 import { Boton } from '../components/Boton'
 import { Pagina } from '../components/Pagina'
 
-// ── Animación en cascada (stagger) ──────────────────────────────────────────
-// En Framer Motion, las "variants" son estados con nombre. El contenedor coordina
-// a sus hijos: "staggerChildren: 0.08" hace que cada tarjeta aparezca 0,08 s
-// después de la anterior → efecto de cascada.
-const variantesLista = {
-  oculto: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-}
-// Cada tarjeta empieza invisible y un poco más abajo, y sube hasta su sitio.
-const variantesTarjeta = {
-  oculto: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0 },
-}
+// Animación en cascada: el contenedor hace aparecer las tarjetas una tras otra.
+const variantesLista = { oculto: {}, visible: { transition: { staggerChildren: 0.08 } } }
+const variantesTarjeta = { oculto: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }
 
 export default function PaginaInicio() {
-  // useLiveQuery LEE la base de datos y se mantiene "vivo": si añades o borras un
-  // vehículo, esta lista se vuelve a dibujar sola. Mientras carga, vale undefined.
-  const vehiculos = useLiveQuery(() => db.vehiculos.toArray())
+  // Leemos vehículos Y mantenimientos a la vez para poder calcular los avisos.
+  const datos = useLiveQuery(async () => {
+    const vehiculos = await db.vehiculos.toArray()
+    const mantenimientos = await db.mantenimientos.toArray()
+    return { vehiculos, mantenimientos }
+  })
+
+  // Para cada vehículo, calculamos el estado más urgente de sus mantenimientos.
+  // Guardamos el resultado en un Map (id del vehículo → estado) para usarlo abajo.
+  const estadoPorVehiculo = new Map<number, EstadoMantenimiento | null>()
+  let totalVencidos = 0
+  let totalProximos = 0
+  if (datos) {
+    for (const v of datos.vehiculos) {
+      const suyos = datos.mantenimientos.filter((m) => m.vehiculoId === v.id)
+      const resumen = resumenEstados(suyos, v.kmActuales)
+      estadoPorVehiculo.set(v.id!, resumen.masUrgente)
+      totalVencidos += resumen.vencidos
+      totalProximos += resumen.proximos
+    }
+  }
+
+  // Notificación al abrir: si hay vencidos y el permiso está dado, avisamos UNA
+  // vez por sesión (usamos sessionStorage como marca para no repetir).
+  useEffect(() => {
+    if (!datos) return
+    if (totalVencidos > 0 && permisoActual() === 'granted' && !sessionStorage.getItem('revisa-avisado')) {
+      mostrarAviso('Revisa', `Tienes ${totalVencidos} mantenimiento(s) vencido(s).`)
+      sessionStorage.setItem('revisa-avisado', '1')
+    }
+  }, [datos, totalVencidos])
+
+  const vehiculos = datos?.vehiculos
+  const hayAvisos = totalVencidos > 0 || totalProximos > 0
 
   return (
-    // motion.div con fade de entrada: la pantalla aparece suavemente.
     <>
       <Pagina className="pb-28">
-        <Cabecera titulo="Mis vehículos" />
+        <Cabecera
+          titulo="Mis vehículos"
+          // Icono de ajustes a la derecha de la cabecera.
+          accion={
+            <Link
+              to="/ajustes"
+              aria-label="Ajustes"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/15"
+            >
+              <Settings size={20} />
+            </Link>
+          }
+        />
 
-      {/* CASO 1: todavía cargando (undefined). No mostramos nada para evitar parpadeos. */}
-      {vehiculos === undefined && null}
-
-      {/* CASO 2: cargó pero no hay ningún vehículo → estado vacío con llamada a la acción. */}
-      {vehiculos?.length === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/5 text-gray-500">
-            <Car size={36} />
+        {/* Banner-resumen de avisos (solo si hay próximos o vencidos). */}
+        {vehiculos && vehiculos.length > 0 && hayAvisos && (
+          <div className="mx-5 mb-4 flex items-center gap-4 rounded-2xl bg-superficie px-4 py-3 text-sm">
+            {totalVencidos > 0 && (
+              <span className="flex items-center gap-2 font-medium text-estado-vencido">
+                <span className="h-2.5 w-2.5 rounded-full bg-estado-vencido" />
+                {totalVencidos} vencido{totalVencidos !== 1 && 's'}
+              </span>
+            )}
+            {totalProximos > 0 && (
+              <span className="flex items-center gap-2 font-medium text-estado-proximo">
+                <span className="h-2.5 w-2.5 rounded-full bg-estado-proximo" />
+                {totalProximos} próximo{totalProximos !== 1 && 's'}
+              </span>
+            )}
           </div>
-          <div>
-            <p className="font-semibold text-white">Aún no tienes vehículos</p>
-            <p className="mt-1 text-sm text-gray-400">
-              Añade tu primer coche para empezar a controlar sus mantenimientos.
-            </p>
+        )}
+
+        {/* CASO 1: cargando → no mostramos nada (evita parpadeos). */}
+        {vehiculos === undefined && null}
+
+        {/* CASO 2: sin vehículos → estado vacío con llamada a la acción. */}
+        {vehiculos?.length === 0 && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/5 text-gray-500">
+              <Car size={36} />
+            </div>
+            <div>
+              <p className="font-semibold text-white">Aún no tienes vehículos</p>
+              <p className="mt-1 text-sm text-gray-400">
+                Añade tu primer coche para empezar a controlar sus mantenimientos.
+              </p>
+            </div>
+            <Link to="/anadir">
+              <Boton>Añadir vehículo</Boton>
+            </Link>
           </div>
-          {/* Link es como un enlace: lleva a la pantalla "/anadir". */}
-          <Link to="/anadir">
-            <Boton>Añadir vehículo</Boton>
-          </Link>
-        </div>
-      )}
+        )}
 
-      {/* CASO 3: hay vehículos → los mostramos en lista, con la cascada. */}
-      {vehiculos && vehiculos.length > 0 && (
-        <motion.ul
-          variants={variantesLista}
-          initial="oculto"
-          animate="visible"
-          className="flex flex-col gap-3 px-5"
-        >
-          {vehiculos.map((vehiculo) => (
-            // "key" ayuda a React a identificar cada elemento de la lista.
-            <motion.li key={vehiculo.id} variants={variantesTarjeta}>
-              {/* Al tocar la tarjeta, vamos al detalle de ese vehículo. */}
-              <Link to={`/vehiculo/${vehiculo.id}`} className="block active:scale-[0.98]">
-                <TarjetaVehiculo vehiculo={vehiculo} />
-              </Link>
-            </motion.li>
-          ))}
-        </motion.ul>
-      )}
-
+        {/* CASO 3: hay vehículos → lista con cascada. */}
+        {vehiculos && vehiculos.length > 0 && (
+          <motion.ul
+            variants={variantesLista}
+            initial="oculto"
+            animate="visible"
+            className="flex flex-col gap-3 px-5"
+          >
+            {vehiculos.map((vehiculo) => (
+              <motion.li key={vehiculo.id} variants={variantesTarjeta}>
+                <Link to={`/vehiculo/${vehiculo.id}`} className="block active:scale-[0.98]">
+                  <TarjetaVehiculo
+                    vehiculo={vehiculo}
+                    estado={estadoPorVehiculo.get(vehiculo.id!) ?? null}
+                  />
+                </Link>
+              </motion.li>
+            ))}
+          </motion.ul>
+        )}
       </Pagina>
 
-      {/* Botón flotante "+" — va FUERA de <Pagina>: como la transición usa
-          transform, un elemento fixed dentro perdería su anclaje a la pantalla. */}
+      {/* Botón flotante "+" — FUERA de <Pagina> (el transform rompería su anclaje fixed). */}
       <Link
         to="/anadir"
         aria-label="Añadir vehículo"

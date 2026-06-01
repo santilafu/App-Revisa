@@ -85,7 +85,16 @@ export default function PaginaDetalleVehiculo() {
 
       {/* Resumen del vehículo. */}
       <div className="mx-5 mb-6 flex items-center gap-4 rounded-2xl bg-superficie p-5">
-        <LogoMarca nombre={vehiculo.marca} color={color} tamano={64} />
+        {/* Si el coche tiene foto, la mostramos; si no, el logo de la marca. */}
+        {vehiculo.foto ? (
+          <img
+            src={vehiculo.foto}
+            alt={`${vehiculo.marca} ${vehiculo.modelo}`}
+            className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+          />
+        ) : (
+          <LogoMarca nombre={vehiculo.marca} color={color} tamano={64} />
+        )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-lg font-bold text-white">
             {vehiculo.marca} {vehiculo.modelo}
