@@ -1,0 +1,40 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CI (Integración Continua): controla la CALIDAD en cada cambio.
+# Ejecuta lint + tests + build automáticamente en cada push a main y en cada
+# Pull Request. Si algo falla, GitHub lo marca en rojo antes de desplegar.
+# ─────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (revisión de estilo y errores)
+        run: pnpm lint
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build (comprobar que compila)
+        run: pnpm build

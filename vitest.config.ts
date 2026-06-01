@@ -1,14 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// vitest.config.ts — configuración de Vitest, el sistema de pruebas (tests).
-// Lo separamos del vite.config para no cargar el plugin de PWA durante los tests.
-// Probamos lógica pura (funciones), así que el entorno "node" es suficiente.
-// Ejecuta los tests con: pnpm test
+// vitest.config.ts — configuración de Vitest (los tests).
+// Usamos "jsdom" para simular el navegador (necesario para probar componentes de
+// React) y un archivo de preparación común. Ejecuta los tests con: pnpm test
 // ─────────────────────────────────────────────────────────────────────────────
 import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  plugins: [react()], // Para que Vitest entienda el JSX de los componentes.
   test: {
-    environment: 'node',
-    include: ['src/**/*.test.ts'], // Solo archivos que terminan en .test.ts
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 })
