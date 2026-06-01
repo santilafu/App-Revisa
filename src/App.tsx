@@ -42,7 +42,10 @@ function Rutas() {
 
 function App() {
   return (
-    <BrowserRouter>
+    // basename = la subcarpeta donde se sirve la app. import.meta.env.BASE_URL vale
+    // "/" en desarrollo y "/App-Revisa/" al compilar para GitHub Pages. Le quitamos
+    // la barra final para que React Router lo entienda bien.
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       {/* Contenedor tipo móvil: columna centrada con ancho máximo. */}
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col">
         <Rutas />

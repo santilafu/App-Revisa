@@ -1,5 +1,18 @@
 # 🚗 Revisa
 
+<p align="center">
+  <img src="public/icono.svg" width="120" alt="Logo de Revisa" />
+</p>
+
+<p align="center">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white" />
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white" />
+  <img alt="PWA" src="https://img.shields.io/badge/PWA-instalable-5a0fc8?logo=pwa&logoColor=white" />
+  <img alt="Licencia" src="https://img.shields.io/badge/uso-personal%2Feducativo-22c55e" />
+</p>
+
 **Recordatorios de mantenimiento de vehículos.** Registra tus coches y sus
 mantenimientos (ITV, seguro, aceite, filtros, ruedas…), y la app te muestra un
 semáforo de color y una cuenta atrás que te avisa cuando toca cada cosa, **por
