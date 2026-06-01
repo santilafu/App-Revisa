@@ -72,7 +72,10 @@ export default function PaginaInicio() {
           {vehiculos.map((vehiculo) => (
             // "key" ayuda a React a identificar cada elemento de la lista.
             <motion.li key={vehiculo.id} variants={variantesTarjeta}>
-              <TarjetaVehiculo vehiculo={vehiculo} />
+              {/* Al tocar la tarjeta, vamos al detalle de ese vehículo. */}
+              <Link to={`/vehiculo/${vehiculo.id}`} className="block active:scale-[0.98]">
+                <TarjetaVehiculo vehiculo={vehiculo} />
+              </Link>
             </motion.li>
           ))}
         </motion.ul>

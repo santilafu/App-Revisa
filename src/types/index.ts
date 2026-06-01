@@ -57,7 +57,11 @@ export interface HistorialMantenimiento {
   id?: number
   mantenimientoId: number  // Qué mantenimiento se completó.
   vehiculoId: number       // De qué vehículo (para consultarlo fácil).
-  fechaRealizado: string   // Cuándo se hizo (texto ISO).
+  // "tipo" es una COPIA (foto) del nombre del mantenimiento en el momento de
+  // completarlo. Lo guardamos aquí porque, al pasar al historial, borramos el
+  // mantenimiento activo: sin esta copia, el historial no sabría qué se hizo.
+  tipo: string
+  fechaRealizado: string   // Cuándo se hizo (formato "AAAA-MM-DD").
   kmRealizado: number      // Con cuántos km se hizo.
   notas?: string           // Notas opcionales (ej. "Cambiado en el taller X").
 }

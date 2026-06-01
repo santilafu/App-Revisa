@@ -8,6 +8,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import PaginaInicio from './pages/PaginaInicio'
 import PaginaAnadirVehiculo from './pages/PaginaAnadirVehiculo'
+import PaginaDetalleVehiculo from './pages/PaginaDetalleVehiculo'
+import PaginaMantenimiento from './pages/PaginaMantenimiento'
+import PaginaHistorial from './pages/PaginaHistorial'
 
 function App() {
   return (
@@ -20,6 +23,11 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaInicio />} />
           <Route path="/anadir" element={<PaginaAnadirVehiculo />} />
+          {/* ":id" y ":mid" son comodines: trozos variables de la URL. */}
+          <Route path="/vehiculo/:id" element={<PaginaDetalleVehiculo />} />
+          <Route path="/vehiculo/:id/mantenimiento/nuevo" element={<PaginaMantenimiento />} />
+          <Route path="/vehiculo/:id/mantenimiento/:mid" element={<PaginaMantenimiento />} />
+          <Route path="/vehiculo/:id/historial" element={<PaginaHistorial />} />
         </Routes>
       </div>
     </BrowserRouter>
