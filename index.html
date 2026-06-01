@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- lang="es": le decimos al navegador que el contenido está en español. -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      viewport: hace que la web se adapte al ancho del móvil.
+      maximum-scale=1 + user-scalable=no: evita el zoom con doble toque,
+      para que se sienta como una app nativa y no como una página web.
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <!-- Color de la barra de estado del móvil cuando la app está abierta (modo oscuro). -->
+    <meta name="theme-color" content="#0b0f17" />
+    <title>Revisa</title>
+  </head>
+  <body>
+    <!-- React "engancha" toda la aplicación dentro de este div vacío. -->
+    <div id="root"></div>
+    <!-- Punto de entrada: ahora es .tsx (TypeScript + JSX), antes era .jsx. -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

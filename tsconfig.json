@@ -1,0 +1,37 @@
+{
+  // ─────────────────────────────────────────────────────────────────────────
+  // tsconfig.json = el "reglamento" de TypeScript para todo el proyecto.
+  // TypeScript es JavaScript con tipos: nos avisa de errores ANTES de ejecutar.
+  // ─────────────────────────────────────────────────────────────────────────
+  "compilerOptions": {
+    // "target": a qué versión de JavaScript se traduce tu código al compilar.
+    "target": "ES2022",
+    // Necesario para que las clases (como nuestra base de datos Dexie) funcionen bien.
+    "useDefineForClassFields": true,
+    // "lib": qué APIs damos por disponibles. DOM = el navegador (document, window...).
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    // No revisar por dentro las librerías externas (más rápido y sin ruido).
+    "skipLibCheck": true,
+
+    // --- Cómo resuelve Vite los imports ---
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true, // Vite genera el JS final; TypeScript solo revisa, no emite archivos.
+    "jsx": "react-jsx", // Permite escribir HTML dentro de JS (JSX) sin importar React.
+
+    // --- Rigor ---
+    "strict": true, // Modo estricto: la mejor red de seguridad para aprender bien.
+    // Las dos siguientes las dejo en FALSE para que, mientras aprendes, una
+    // variable que aún no usas no rompa la compilación. Las activaremos más tarde.
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  // Revisamos todo lo de "src" y también el archivo de configuración de Vite.
+  "include": ["src", "vite.config.ts"]
+}
